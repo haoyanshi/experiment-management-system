@@ -1,0 +1,28 @@
+{
+  "name": "experiment-management-system",
+  "version": "1.0.0",
+  "description": "一个用于管理实验和实验记录的本地网页应用",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "python -m http.server 8080"
+  },
+  "keywords": [
+    "experiment",
+    "management",
+    "research",
+    "laboratory",
+    "local"
+  ],
+  "author": "实验管理系统",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

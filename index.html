@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/plan-editor.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>实验管理系统</h1>
+            <nav>
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active" data-tab="dashboard">概览</a></li>
+                    <li><a href="#plans" class="nav-link" data-tab="plans">实验计划</a></li>
+                    <li><a href="#experiments" class="nav-link" data-tab="experiments">实验管理</a></li>
+                    <li><a href="#records" class="nav-link" data-tab="records">实验记录</a></li>
+                    <li><a href="#analysis" class="nav-link" data-tab="analysis">数据分析</a></li>
+                    <li><a href="#files" class="nav-link" data-tab="files">文件管理</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 概览页面 -->
+            <div id="dashboard" class="tab-content active">
+                <h2>实验概览</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>进行中的实验</h3>
+                        <span class="stat-number" id="active-experiments">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>进行中的计划</h3>
+                        <span class="stat-number" id="active-plans">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总实验记录</h3>
+                        <span class="stat-number" id="total-records">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>本月新增</h3>
+                        <span class="stat-number" id="monthly-records">0</span>
+                    </div>
+                </div>
+                <div class="recent-activities">
+                    <h3>最近活动</h3>
+                    <ul id="recent-activities-list">
+                        <li>欢迎使用实验管理系统</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 实验计划页面 -->
+            <div id="plans" class="tab-content">
+                <div class="page-header">
+                    <h2>实验计划</h2>
+                    <button class="btn btn-primary" onclick="showAddPlanModal()">新建计划</button>
+                </div>
+                <div class="filters">
+                    <select id="plan-status-filter">
+                        <option value="">所有状态</option>
+                        <option value="draft">草稿</option>
+                        <option value="active">进行中</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                    <input type="text" id="plan-search-filter" placeholder="搜索计划...">
+                </div>
+                <div class="plans-list" id="plans-list">
+                    <!-- 计划列表将在这里动态生成 -->
+                </div>
+            </div>
+
+            <!-- 实验管理页面 -->
+            <div id="experiments" class="tab-content">
+                <div class="page-header">
+                    <h2>实验管理</h2>
+                    <button class="btn btn-primary" onclick="showAddExperimentModal()">新建实验</button>
+                </div>
+                <div class="experiment-list" id="experiment-list">
+                    <!-- 实验列表将在这里动态生成 -->
+                </div>
+            </div>
+
+            <!-- 实验记录页面 -->
+            <div id="records" class="tab-content">
+                <div class="page-header">
+                    <h2>实验记录</h2>
+                    <button class="btn btn-primary" onclick="showAddRecordModal()">添加记录</button>
+                </div>
+                <div class="filters">
+                    <select id="experiment-filter">
+                        <option value="">所有实验</option>
+                    </select>
+                    <input type="date" id="date-filter" placeholder="选择日期">
+                    <input type="text" id="search-filter" placeholder="搜索记录...">
+                </div>
+                <div class="records-list" id="records-list">
+                    <!-- 记录列表将在这里动态生成 -->
+                </div>
+            </div>
+
+            <!-- 数据分析页面 -->
+            <div id="analysis" class="tab-content">
+                <h2>数据分析</h2>
+                <div class="analysis-summary" id="analysis-summary">
+                    <!-- 分析摘要将在这里显示 -->
+                </div>
+            </div>
+
+            <!-- 文件管理页面 -->
+            <div id="files" class="tab-content">
+                <div class="page-header">
+                    <h2>文件管理</h2>
+                    <div class="file-upload-section">
+                        <input type="file" id="file-upload" multiple style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('file-upload').click()">📁 上传文件</button>
+                        <button class="btn btn-secondary" onclick="app.exportData()" style="margin-left: 1rem;">📤 导出数据</button>
+                        <input type="file" id="import-data" accept=".json" style="display: none;" onchange="handleImportData(this)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('import-data').click()" style="margin-left: 0.5rem;">📥 导入数据</button>
+                    </div>
+                </div>
+                <div class="file-storage-info" style="margin-bottom: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 5px; border-left: 4px solid #2196F3;">
+                    <h4 style="margin: 0 0 0.5rem 0; color: #1976D2;">💡 文件存储原理说明</h4>
+                    <p style="margin: 0; font-size: 0.9rem; color: #424242;">
+                        • <strong>存储方式:</strong> 文件内容转换为Base64格式存储在浏览器的localStorage数据库中<br>
+                        • <strong>存储位置:</strong> 浏览器数据文件夹（非你的项目文件夹），类似浏览器缓存<br>
+                        • <strong>优势:</strong> 无需服务器，直接双击HTML即可使用完整功能<br>
+                        • <strong>限制:</strong> localStorage通常限制5-10MB，清除浏览器数据会丢失文件<br>
+                        • <strong>建议:</strong> 定期使用"导出数据"功能备份重要实验数据到本地JSON文件
+                    </p>
+                </div>
+                <div class="files-list" id="files-list">
+                    <!-- 文件列表将在这里动态生成 -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新建实验模态框 -->
+    <div id="add-experiment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('add-experiment-modal')">&times;</span>
+            <h3>新建实验</h3>
+            <form id="add-experiment-form">
+                <div class="form-group">
+                    <label for="experiment-title">实验标题：</label>
+                    <input type="text" id="experiment-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="experiment-description">实验描述：</label>
+                    <textarea id="experiment-description" name="description" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="experiment-category">实验分类：</label>
+                    <input type="text" id="experiment-category" name="category">
+                </div>
+                <div class="form-group">
+                    <label for="experiment-start-date">开始日期：</label>
+                    <input type="date" id="experiment-start-date" name="startDate">
+                </div>
+                <div class="form-group">
+                    <label for="experiment-end-date">预计结束日期：</label>
+                    <input type="date" id="experiment-end-date" name="endDate">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">创建实验</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-experiment-modal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加记录模态框 -->
+    <div id="add-record-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('add-record-modal')">&times;</span>
+            <h3>添加实验记录</h3>
+            <form id="add-record-form">
+                <div class="form-group">
+                    <label for="record-experiment">选择实验：</label>
+                    <select id="record-experiment" name="experimentId" required>
+                        <option value="">请选择实验</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="record-date">记录日期：</label>
+                    <input type="date" id="record-date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="record-content">记录内容：</label>
+                    <textarea id="record-content" name="content" rows="6" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="record-parameters">实验参数：</label>
+                    <textarea id="record-parameters" name="parameters" rows="3" placeholder="例如：温度：25°C，湿度：60%"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="record-results">实验结果：</label>
+                    <textarea id="record-results" name="results" rows="4"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">添加记录</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-record-modal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新建计划模态框 -->
+    <div id="add-plan-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('add-plan-modal')">&times;</span>
+            <h3 id="plan-modal-title">新建实验计划</h3>
+            
+            <div class="plan-editor">
+                <div class="plan-editor-header">
+                    <input type="text" id="plan-title" class="plan-title-input" placeholder="输入计划标题..." value="新建实验计划">
+                    <select id="plan-status" class="plan-status-select">
+                        <option value="draft">草稿</option>
+                        <option value="active">进行中</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                    <button type="button" class="btn btn-info" onclick="showTimelineView()" title="查看时间线">
+                        <span>📊</span> 时间线视图
+                    </button>
+                </div>
+                
+                <div id="plan-modules" class="plan-modules">
+                    <!-- 模块将在这里动态生成 -->
+                </div>
+                
+                <button class="add-module-btn" onclick="showModuleTypeSelector(null, event)">
+                    <span>➕</span>
+                    <span>添加模块</span>
+                </button>
+                
+                <div class="form-actions" style="margin-top: 30px;">
+                    <button type="button" class="btn btn-primary" onclick="savePlan()">保存计划</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelPlanEdit()">取消</button>
+                    <button type="button" class="btn btn-danger" id="delete-plan-btn" style="display: none;" onclick="deletePlanFromEditor()">删除计划</button>
+                    <button type="button" class="export-plan-btn" onclick="exportPlanAsMarkdown()" style="float: right;">导出为Markdown</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模块类型选择器 -->
+    <div id="module-type-selector" class="module-type-selector">
+        <!-- 模块类型选项将在这里动态生成 -->
+    </div>
+
+    <!-- 计划详情模态框 -->
+    <div id="plan-detail-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('plan-detail-modal')">&times;</span>
+            <div class="plan-detail-header">
+                <h3 id="plan-detail-title"></h3>
+                <div class="plan-detail-actions">
+                    <button class="btn btn-secondary" onclick="editPlan()">编辑</button>
+                    <button class="btn btn-primary" onclick="createExperimentFromPlan()">创建实验</button>
+                    <button class="btn btn-danger" onclick="deletePlan()">删除计划</button>
+                </div>
+            </div>
+            <div id="plan-detail-content">
+                <!-- 计划详情将在这里动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 处理数据导入
+        function handleImportData(input) {
+            const file = input.files[0];
+            if (file) {
+                app.importData(file);
+                input.value = ''; // 清空input
+            }
+        }
+    </script>
+    <script src="js/plan-module.js"></script>
+    <script src="js/plan-editor.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/data.js"></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3组qPCR比较功能测试说明</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #495057;
+            margin-top: 30px;
+        }
+        .feature-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .example-data {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+        .step {
+            background: #f1f3f5;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .step strong {
+            color: #667eea;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .update-box {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .update-box h3 {
+            color: #4caf50;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 3组qPCR两两比较功能 - 完整使用说明</h1>
+        
+        <div class="update-box">
+            <h3>🎉 更新通知</h3>
+            <p><strong>文件导入功能现已支持3组比较！</strong>您现在可以在手动输入和文件导入两种模式下使用3组两两比较功能。</p>
+        </div>
+        
+        <div class="feature-box">
+            <h3>✨ 新功能概述</h3>
+            <p>实验管理系统的qPCR分析模块现已<strong>完整支持3组数据的两两比较</strong>！无论是手动输入数据还是从文件导入，都可以进行3组比较分析。</p>
+        </div>
+
+        <h2>📋 功能特点</h2>
+        <ul>
+            <li><strong>双模式支持</strong>：手动输入和文件导入都支持3组比较</li>
+            <li><strong>自动两两比较</strong>：系统自动进行组1 vs 组2、组1 vs 组3、组2 vs 组3的比较</li>
+            <li><strong>统计分析</strong>：每个比较都提供完整的统计数据（t检验、p值、倍数变化）</li>
+            <li><strong>可视化结果</strong>：清晰的表格和图表展示所有比较结果</li>
+            <li><strong>数据导出</strong>：支持JSON和CSV格式导出，方便后续分析</li>
+            <li><strong>结果保存</strong>：可将分析结果保存到实验记录中</li>
+        </ul>
+
+        <h2>🚀 使用方法一：手动输入模式</h2>
+        
+        <div class="step">
+            <strong>步骤1：进入qPCR分析模块</strong>
+            <p>打开实验管理系统 → 点击"数据分析"标签 → 选择"qPCR分析"</p>
+        </div>
+
+        <div class="step">
+            <strong>步骤2：选择数据来源</strong>
+            <p>确保选中"手工输入"标签</p>
+        </div>
+
+        <div class="step">
+            <strong>步骤3：选择分析类型</strong>
+            <p>在"选择分析类型"部分，点击"3组两两比较"按钮</p>
+        </div>
+
+        <div class="step">
+            <strong>步骤4：输入数据</strong>
+            <p>输入参考基因、目标基因名称，以及3个组的Ct值数据</p>
+        </div>
+
+        <h2>🚀 使用方法二：文件导入模式</h2>
+        
+        <div class="step">
+            <strong>步骤1：上传qPCR数据文件</strong>
+            <p>先在"文件管理"中上传包含qPCR数据的文件（支持CSV、Excel等格式）</p>
+        </div>
+
+        <div class="step">
+            <strong>步骤2：进入qPCR分析</strong>
+            <p>点击"数据分析" → "qPCR分析" → 选择"文件导入"标签</p>
+        </div>
+
+        <div class="step">
+            <strong>步骤3：选择文件并配置分析</strong>
+            <ol>
+                <li>从文件列表中选择您的qPCR数据文件</li>
+                <li>在数据分析设置界面，选择"3组两两比较"</li>
+                <li>选择参考基因和目标基因</li>
+                <li>分别选择3个要比较的组</li>
+                <li>点击"开始分析"</li>
+            </ol>
+        </div>
+
+        <h2>📊 数据文件格式要求</h2>
+        <div class="example-data">
+            文件应包含以下列：<br>
+            - Target（或Target Name）：基因名称<br>
+            - CT（或Ct、Cq）：Ct值<br>
+            - Biological Set Name（或Sample）：样本组名称<br><br>
+            
+            示例数据：<br>
+            Target,CT,Biological Set Name<br>
+            GAPDH,20.1,Control<br>
+            IL-6,25.1,Control<br>
+            GAPDH,20.0,Treatment1<br>
+            IL-6,22.1,Treatment1<br>
+            GAPDH,20.2,Treatment2<br>
+            IL-6,23.2,Treatment2
+        </div>
+
+        <h2>📈 分析结果说明</h2>
+        <div class="feature-box">
+            <h4>3组比较结果包含：</h4>
+            <ol>
+                <li><strong>比较结果汇总表</strong>：展示所有两两比较的倍数变化、p值和显著性</li>
+                <li><strong>详细统计数据</strong>：每个比较的ΔCt值、相对表达量及其标准误</li>
+                <li><strong>可视化图表</strong>：柱状图直观展示3个组的相对表达量</li>
+                <li><strong>统计检验</strong>：独立样本t检验结果</li>
+            </ol>
+        </div>
+
+        <div class="note">
+            <strong>💡 注意事项：</strong>
+            <ul>
+                <li>组1始终作为对照组，其相对表达量设为1.000</li>
+                <li>每个比较中，第一个组作为对照，第二个组作为实验组</li>
+                <li>显著性水平：*p&lt;0.05, **p&lt;0.01, ***p&lt;0.001</li>
+                <li>确保每组至少有2个重复数据以进行统计分析</li>
+                <li>文件导入模式下，目前仅支持单基因的3组比较</li>
+            </ul>
+        </div>
+
+        <h2>💾 数据保存与导出</h2>
+        <ul>
+            <li><strong>保存到实验记录</strong>：点击"保存结果到实验记录"按钮，将完整的分析报告保存</li>
+            <li><strong>导出JSON</strong>：包含所有原始数据和计算结果，适合程序化处理</li>
+            <li><strong>导出CSV</strong>：表格格式，方便在Excel中进一步分析</li>
+        </ul>
+
+        <div class="feature-box" style="background: #e8f5e9; border-color: #4caf50;">
+            <h3>🎯 快速开始</h3>
+            <p>现在就打开<a href="index.html">实验管理系统</a>，试试完整的3组qPCR比较功能吧！无论是手动输入还是文件导入，都能轻松完成分析。</p>
+        </div>
+    </div>
+</body>
+</html>

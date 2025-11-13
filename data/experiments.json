@@ -1,0 +1,41 @@
+{
+  "experiments": [
+    {
+      "id": "example-1",
+      "title": "示例实验项目",
+      "description": "这是一个示例实验，展示系统的基本功能。你可以删除这个示例并创建自己的实验。",
+      "category": "示例",
+      "startDate": "2024-01-01",
+      "endDate": "2024-12-31",
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "records": [
+    {
+      "id": "record-1",
+      "experimentId": "example-1",
+      "date": "2024-01-01",
+      "content": "这是一条示例实验记录。在这里记录你的实验过程、观察结果和重要发现。",
+      "parameters": "温度: 25°C, 湿度: 60%, pH值: 7.0",
+      "results": "实验进行顺利，获得了预期的结果。建议在下次实验中调整温度参数。",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "record-2",
+      "experimentId": "example-1",
+      "date": "2024-01-02",
+      "content": "<table><thead><tr><th>样本编号</th><th>浓度(mg/ml)</th><th>吸光度</th><th>结果</th></tr></thead><tbody><tr><td>A1</td><td>1.0</td><td>0.156</td><td>合格</td></tr><tr><td>A2</td><td>2.0</td><td>0.312</td><td>合格</td></tr><tr><td>A3</td><td>3.0</td><td>0.468</td><td>合格</td></tr><tr><td>A4</td><td>4.0</td><td>0.624</td><td>合格</td></tr></tbody></table>",
+      "parameters": "测试条件：室温，使用标准试剂",
+      "results": "| 组别 | 平均值 | 标准差 | p值 |\n| 对照组 | 1.25 | 0.15 | - |\n| 实验组A | 2.34 | 0.22 | 0.001 |\n| 实验组B | 3.12 | 0.18 | 0.0001 |",
+      "createdAt": "2024-01-02T00:00:00.000Z"
+    }
+  ],
+  "files": [],
+  "plans": [],
+  "meta": {
+    "version": "1.0.0",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "lastModified": "2024-01-02T00:00:00.000Z"
+  }
+}

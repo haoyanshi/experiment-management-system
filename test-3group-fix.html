@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3组qPCR修复测试</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>3组qPCR功能修复测试</h1>
+    <p>修复内容：</p>
+    <ol>
+        <li>修正了 generate3GroupDataRows 方法中的数据访问路径</li>
+        <li>修正了 generateAll3GroupsDataRows 方法中的数据访问路径</li>
+        <li>原错误：尝试访问 comparison.rawData.control.refCt</li>
+        <li>修正后：正确访问 comparison.rawData.controlRefCt</li>
+    </ol>
+    
+    <h2>错误原因分析</h2>
+    <p>performQPCRCalculation 方法返回的 rawData 结构是：</p>
+    <pre>
+    rawData: {
+        controlRefCt,    // 对照组参考基因Ct值数组
+        controlTargetCt, // 对照组目标基因Ct值数组
+        expRefCt,        // 实验组参考基因Ct值数组
+        expTargetCt      // 实验组目标基因Ct值数组
+    }
+    </pre>
+    
+    <p>而不是：</p>
+    <pre>
+    rawData: {
+        control: { refCt: [], targetCt: [] },
+        experimental: { refCt: [], targetCt: [] }
+    }
+    </pre>
+    
+    <h2>测试步骤</h2>
+    <ol>
+        <li>打开实验管理系统</li>
+        <li>进入"数据分析" → "qPCR分析"</li>
+        <li>选择"文件导入"标签</li>
+        <li>选择含有3组数据的qPCR文件</li>
+        <li>选择"3组两两比较"</li>
+        <li>选择参考基因、目标基因和3个组</li>
+        <li>点击"开始分析"</li>
+        <li>验证结果显示完整的Ct值数据表</li>
+    </ol>
+    
+    <p style="margin-top: 30px;">
+        <a href="index.html" style="padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">
+            返回实验管理系统
+        </a>
+    </p>
+</body>
+</html>
