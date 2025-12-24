@@ -1,15 +1,44 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实验管理系统</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- Fonts: Playfair Display + Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/plan-editor.css">
 </head>
 <body>
-    <div class="container">
-        <header>
+    <!-- Background Patterns -->
+    <div class="bg-pattern pattern-star"></div>
+    <div class="bg-pattern bg-grain"></div>
+
+    <header>
+        <div class="header-inner">
             <h1>实验管理系统</h1>
             <nav>
                 <ul>
@@ -21,9 +50,11 @@
                     <li><a href="#files" class="nav-link" data-tab="files">文件管理</a></li>
                 </ul>
             </nav>
-        </header>
+        </div>
+    </header>
 
-        <main>
+    <main>
+        <div class="container">
             <!-- 概览页面 -->
             <div id="dashboard" class="tab-content active">
                 <h2>实验概览</h2>
@@ -122,9 +153,9 @@
                         <button class="btn btn-secondary" onclick="document.getElementById('import-data').click()" style="margin-left: 0.5rem;">📥 导入数据</button>
                     </div>
                 </div>
-                <div class="file-storage-info" style="margin-bottom: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 5px; border-left: 4px solid #2196F3;">
-                    <h4 style="margin: 0 0 0.5rem 0; color: #1976D2;">💡 文件存储原理说明</h4>
-                    <p style="margin: 0; font-size: 0.9rem; color: #424242;">
+                <div class="file-storage-info">
+                    <h4>文件存储原理说明</h4>
+                    <p>
                         • <strong>存储方式:</strong> 文件内容转换为Base64格式存储在浏览器的localStorage数据库中<br>
                         • <strong>存储位置:</strong> 浏览器数据文件夹（非你的项目文件夹），类似浏览器缓存<br>
                         • <strong>优势:</strong> 无需服务器，直接双击HTML即可使用完整功能<br>
@@ -136,8 +167,8 @@
                     <!-- 文件列表将在这里动态生成 -->
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <!-- 新建实验模态框 -->
     <div id="add-experiment-modal" class="modal">
