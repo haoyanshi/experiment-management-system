@@ -1089,6 +1089,7 @@ class ExperimentApp {
                                 <th style="border: 1px solid #dee2e6; padding: 8px;">${results.referenceGene} Ct</th>
                                 <th style="border: 1px solid #dee2e6; padding: 8px;">${results.targetGene} Ct</th>
                                 <th style="border: 1px solid #dee2e6; padding: 8px;">ΔCt</th>
+                                <th style="border: 1px solid #dee2e6; padding: 8px;">2<sup>(-ΔΔCt)</sup></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1110,7 +1111,7 @@ class ExperimentApp {
     draw3GroupComparisonChart(container, results) {
         // 计算所有组的数据用于图表
         const groupData = new Map();
-        
+
         // 初始化组数据
         results.comparisons.forEach(comp => {
             if (!groupData.has(comp.controlGroup)) {
@@ -1120,12 +1121,12 @@ class ExperimentApp {
                 groupData.set(comp.experimentalGroup, { name: comp.experimentalGroup, values: [] });
             }
         });
-        
+
         // 组1作为对照组，设为1
         const group1Name = results.comparisons[0].controlGroup;
         groupData.get(group1Name).mean = 1;
         groupData.get(group1Name).sem = results.comparisons[0].statistics.control.sem;
-        
+
         // 从比较结果中提取其他组的数据
         results.comparisons.forEach(comp => {
             if (comp.controlGroup === group1Name) {
@@ -1134,17 +1135,62 @@ class ExperimentApp {
                 expGroup.sem = comp.statistics.experimental.sem;
             }
         });
-        
+
         const groups = Array.from(groupData.values());
-        const maxValue = Math.max(...groups.map(g => (g.mean || 0) + (g.sem || 0))) * 1.2;
-        
+        const maxValue = Math.max(...groups.map(g => (g.mean || 0) + (g.sem || 0))) * 1.5;
+
+        // 生成显著性标记的函数
+        const getSignificanceMarker = (pValue) => {
+            if (pValue < 0.001) return '***';
+            if (pValue < 0.01) return '**';
+            if (pValue < 0.05) return '*';
+            return 'ns';
+        };
+
+        // 获取各组之间的p值
+        const pValues = {};
+        results.comparisons.forEach(comp => {
+            const key = `${comp.controlGroup}-${comp.experimentalGroup}`;
+            pValues[key] = comp.tTest.pValue;
+        });
+
         container.innerHTML = `
             <h5>📈 3组相对表达量比较图表</h5>
-            <div style="display: flex; justify-content: center; align-items: end; height: 250px; margin-top: 20px;">
+            <div style="position: relative; display: flex; justify-content: center; align-items: end; height: 320px; margin-top: 20px; padding-top: 70px;">
+                <!-- 显著性标记线条 -->
+                <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                    <!-- 第一组 vs 第二组 -->
+                    ${groups.length >= 2 ? `
+                        <line x1="calc(50% - 70px)" y1="70" x2="calc(50%)" y2="70" stroke="#333" stroke-width="1"/>
+                        <line x1="calc(50% - 70px)" y1="70" x2="calc(50% - 70px)" y2="75" stroke="#333" stroke-width="1"/>
+                        <line x1="calc(50%)" y1="70" x2="calc(50%)" y2="75" stroke="#333" stroke-width="1"/>
+                        <text x="calc(50% - 35px)" y="65" text-anchor="middle" font-size="14" font-weight="bold" fill="${pValues[groups[0].name + '-' + groups[1].name] < 0.05 ? '#d32f2f' : '#666'}">
+                            ${getSignificanceMarker(pValues[groups[0].name + '-' + groups[1].name] || 1)}
+                        </text>
+                    ` : ''}
+                    <!-- 第二组 vs 第三组 -->
+                    ${groups.length >= 3 ? `
+                        <line x1="calc(50%)" y1="45" x2="calc(50% + 70px)" y2="45" stroke="#333" stroke-width="1"/>
+                        <line x1="calc(50%)" y1="45" x2="calc(50%)" y2="50" stroke="#333" stroke-width="1"/>
+                        <line x1="calc(50% + 70px)" y1="45" x2="calc(50% + 70px)" y2="50" stroke="#333" stroke-width="1"/>
+                        <text x="calc(50% + 35px)" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="${pValues[groups[1].name + '-' + groups[2].name] < 0.05 ? '#d32f2f' : '#666'}">
+                            ${getSignificanceMarker(pValues[groups[1].name + '-' + groups[2].name] || 1)}
+                        </text>
+                    ` : ''}
+                    <!-- 第一组 vs 第三组 -->
+                    ${groups.length >= 3 ? `
+                        <line x1="calc(50% - 70px)" y1="20" x2="calc(50% + 70px)" y2="20" stroke="#333" stroke-width="1"/>
+                        <line x1="calc(50% - 70px)" y1="20" x2="calc(50% - 70px)" y2="25" stroke="#333" stroke-width="1"/>
+                        <line x1="calc(50% + 70px)" y1="20" x2="calc(50% + 70px)" y2="25" stroke="#333" stroke-width="1"/>
+                        <text x="50%" y="15" text-anchor="middle" font-size="14" font-weight="bold" fill="${pValues[groups[0].name + '-' + groups[2].name] < 0.05 ? '#d32f2f' : '#666'}">
+                            ${getSignificanceMarker(pValues[groups[0].name + '-' + groups[2].name] || 1)}
+                        </text>
+                    ` : ''}
+                </svg>
                 ${groups.map((group, index) => `
                     <div style="text-align: center; margin: 0 20px;">
-                        <div style="width: 60px; height: ${((group.mean || 0) / maxValue) * 200}px; 
-                            background: linear-gradient(45deg, ${index === 0 ? '#667eea, #764ba2' : index === 1 ? '#f18f01, #ff6b6b' : '#00c851, #00a152'}); 
+                        <div style="width: 60px; height: ${((group.mean || 0) / maxValue) * 200}px;
+                            background: linear-gradient(45deg, ${index === 0 ? '#667eea, #764ba2' : index === 1 ? '#f18f01, #ff6b6b' : '#00c851, #00a152'});
                             margin: 0 auto; position: relative; border-radius: 4px;">
                             <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 2px; height: ${((group.sem || 0) / maxValue) * 200}px; background: #333;"></div>
                             <div style="position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 10px; height: 2px; background: #333;"></div>
@@ -1154,6 +1200,12 @@ class ExperimentApp {
                         <div style="font-size: 12px; color: #666;">${(group.mean || 0).toFixed(3)} ± ${(group.sem || 0).toFixed(3)}</div>
                     </div>
                 `).join('')}
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #666;">
+                <span style="margin-right: 15px;">* p&lt;0.05</span>
+                <span style="margin-right: 15px;">** p&lt;0.01</span>
+                <span style="margin-right: 15px;">*** p&lt;0.001</span>
+                <span>ns: 不显著</span>
             </div>
         `;
     }
@@ -1570,7 +1622,7 @@ class ExperimentApp {
     // 生成3组比较中单个比较的数据行
     generate3GroupDataRows(comparison, refGeneName, targetGeneName) {
         const rows = [];
-        
+
         // 添加对照组数据
         const controlRefCt = comparison.rawData.controlRefCt;
         const controlTargetCt = comparison.rawData.controlTargetCt;
@@ -1580,10 +1632,11 @@ class ExperimentApp {
             const deltaCt = comparison.deltaCt.control.values[i];
             const deltaDeltaCt = deltaCt - comparison.deltaCt.control.mean;
             const relativeExp = Math.pow(2, -deltaDeltaCt);
-            
+
             rows.push(`
                 <tr>
-                    <td style="border: 1px solid #dee2e6; padding: 8px;">${comparison.controlGroup} ${i + 1}</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px;">${comparison.controlGroup}</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px;">${i + 1}</td>
                     <td style="border: 1px solid #dee2e6; padding: 8px;">${refCt.toFixed(2)}</td>
                     <td style="border: 1px solid #dee2e6; padding: 8px;">${targetCt.toFixed(2)}</td>
                     <td style="border: 1px solid #dee2e6; padding: 8px;">${deltaCt.toFixed(3)}</td>
@@ -1592,7 +1645,7 @@ class ExperimentApp {
                 </tr>
             `);
         }
-        
+
         // 添加实验组数据
         const expRefCt = comparison.rawData.expRefCt;
         const expTargetCt = comparison.rawData.expTargetCt;
@@ -1602,10 +1655,11 @@ class ExperimentApp {
             const deltaCt = comparison.deltaCt.experimental.values[i];
             const deltaDeltaCt = deltaCt - comparison.deltaCt.control.mean;
             const relativeExp = comparison.relativeExpression.experimental[i];
-            
+
             rows.push(`
                 <tr style="background-color: #f8f9fa;">
-                    <td style="border: 1px solid #dee2e6; padding: 8px;">${comparison.experimentalGroup} ${i + 1}</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px;">${comparison.experimentalGroup}</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px;">${i + 1}</td>
                     <td style="border: 1px solid #dee2e6; padding: 8px;">${refCt.toFixed(2)}</td>
                     <td style="border: 1px solid #dee2e6; padding: 8px;">${targetCt.toFixed(2)}</td>
                     <td style="border: 1px solid #dee2e6; padding: 8px;">${deltaCt.toFixed(3)}</td>
@@ -1614,7 +1668,7 @@ class ExperimentApp {
                 </tr>
             `);
         }
-        
+
         return rows.join('');
     }
 
